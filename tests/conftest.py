@@ -7,6 +7,7 @@ from sqlalchemy.pool import StaticPool
 from curso_fastapi.app import app
 from curso_fastapi.database import get_session
 from curso_fastapi.models import User, table_registry
+from curso_fastapi.security import get_password_hash
 
 
 @pytest.fixture
@@ -37,9 +38,21 @@ def session():
 
 @pytest.fixture
 def user(session):
-    user = User(username='test', password='test', email='test@test.com')
+    password = 'test'
+    user = User(
+        username='test', password=get_password_hash(password), email='test@test.com'
+    )
     session.add(user)
     session.commit()
     session.refresh(user)
-
+    user.cleaned_password = password
     return user
+
+
+@pytest.fixture
+def token(client, user):
+    response = client.post(
+        '/token',
+        data={'username': user.username, 'password': user.cleaned_password},
+    )
+    return response.json()['access_token']
