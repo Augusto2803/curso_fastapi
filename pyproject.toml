@@ -11,7 +11,7 @@ fastapi = { extras = ["standard"], version = "^0.112.1" }
 sqlalchemy = "^2.0.32"
 pydantic-settings = "^2.4.0"
 alembic = "^1.13.2"
-pwdlib = {extras = ["argon2"], version = "^0.2.0"}
+pwdlib = { extras = ["argon2"], version = "^0.2.0" }
 python-multipart = "^0.0.9"
 pyjwt = "^2.9.0"
 
@@ -39,7 +39,7 @@ lint = 'ruff check . && ruff check . --diff'
 format = 'ruff check . --fix && ruff format .'
 run = 'fastapi dev curso_fastapi/app.py'
 pre_test = 'task lint'
-test = 'pytest -s -x --cov=curso_fastapi -vv'
+test = 'pytest -s --cov=curso_fastapi -vv'
 post_test = 'coverage html'
 
 [tool.taskipy]
