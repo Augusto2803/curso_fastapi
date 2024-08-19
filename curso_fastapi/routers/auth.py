@@ -9,7 +9,11 @@ from sqlalchemy.orm import Session
 from curso_fastapi.database import get_session
 from curso_fastapi.models import User
 from curso_fastapi.schemas import Token
-from curso_fastapi.security import create_access_token, verify_password
+from curso_fastapi.security import (
+    create_access_token,
+    get_current_user,
+    verify_password,
+)
 
 auth_router = APIRouter(
     prefix='/auth',
@@ -17,6 +21,7 @@ auth_router = APIRouter(
 )
 T_Session = Annotated[Session, Depends(get_session)]
 T_OAuth2Form = Annotated[OAuth2PasswordRequestForm, Depends()]
+T_CurrentUser = Annotated[User, Depends(get_current_user)]
 
 
 @auth_router.post('/token/', response_model=Token)
@@ -38,3 +43,10 @@ def login_for_access_token(form_data: T_OAuth2Form, session: T_Session):
     access_token = create_access_token(data={'sub': user.username})
 
     return {'access_token': access_token, 'token_type': 'Bearer'}
+
+
+@auth_router.post('/token/refresh/', response_model=Token)
+def refresh_token(session: T_Session, current_user: T_CurrentUser):
+    new_acess_token = create_access_token(data={'sub': current_user.username})
+
+    return {'access_token': new_acess_token, 'token_type': 'Bearer'}

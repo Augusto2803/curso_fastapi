@@ -56,9 +56,9 @@ def test_list_users(client, user):
     assert response_data == {
         'users': [
             {
-                'id': 1,
-                'username': 'test',
-                'email': 'test@test.com',
+                'id': user.id,
+                'username': user.username,
+                'email': user.email,
                 'created_at': user.created_at.isoformat(),
                 'updated_at': user.updated_at.isoformat(),
             }
@@ -72,9 +72,9 @@ def test_get_user_by_id(client, user):
 
     response_data = response.json()
     assert response_data == {
-        'id': 1,
-        'username': 'test',
-        'email': 'test@test.com',
+        'id': user.id,
+        'username': user.username,
+        'email': user.email,
         'created_at': user.created_at.isoformat(),
         'updated_at': user.updated_at.isoformat(),
     }
@@ -107,13 +107,13 @@ def test_update_user(client, user, token):
     }
 
 
-def test_update_user_with_different_user_id(client, user, token):
+def test_update_user_with_different_user_id(client, another_user, token):
     response = client.put(
-        f'/users/{user.id + 1}/',
+        f'/users/{another_user.id}/',
         json={
             'username': 'testabcde12345',
             'password': '123456',
-            'email': user.email,
+            'email': another_user.email,
         },
         headers={'Authorization': f'Bearer {token}'},
     )
@@ -130,9 +130,9 @@ def test_delete_user(client, user, token):
     assert response.status_code == HTTPStatus.NO_CONTENT
 
 
-def test_delete_user_with_different_user_id(client, user, token):
+def test_delete_user_with_different_user_id(client, another_user, token):
     response = client.delete(
-        f'/users/{user.id + 1}/',
+        f'/users/{another_user.id}/',
         headers={'Authorization': f'Bearer {token}'},
     )
     assert response.status_code == HTTPStatus.FORBIDDEN
