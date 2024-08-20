@@ -1,5 +1,7 @@
 import factory
 import pytest
+from factory import fuzzy
+from faker import Faker
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
@@ -7,8 +9,20 @@ from sqlalchemy.pool import StaticPool
 
 from curso_fastapi.app import app
 from curso_fastapi.database import get_session
-from curso_fastapi.models import User, table_registry
+from curso_fastapi.models import Task, TaskState, User, table_registry
 from curso_fastapi.security import get_password_hash
+
+fake = Faker('pt_BR')
+
+
+class TaskFactory(factory.Factory):
+    class Meta:
+        model = Task
+
+    title = factory.LazyAttribute(lambda _: fake.sentence())
+    description = factory.LazyAttribute(lambda _: fake.text())
+    state = fuzzy.FuzzyChoice(TaskState)
+    user_id = 1
 
 
 class UserFactory(factory.Factory):
@@ -75,3 +89,13 @@ def token(client, user):
         data={'username': user.username, 'password': user.cleaned_password},
     )
     return response.json()['access_token']
+
+
+@pytest.fixture
+def task(session, user):
+    description = 'Test Description'
+    task = TaskFactory(user_id=user.id, description=description)
+    session.add(task)
+    session.commit()
+    session.refresh(task)
+    return task

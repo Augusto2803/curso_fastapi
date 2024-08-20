@@ -2,6 +2,8 @@ from datetime import datetime
 
 from pydantic import BaseModel, EmailStr
 
+from curso_fastapi.models import TaskState
+
 
 class UserCreate(BaseModel):
     username: str
@@ -31,3 +33,31 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
     username: str | None = None
+
+
+class TaskCreate(BaseModel):
+    title: str
+    description: str
+    state: TaskState
+
+
+class TaskResponse(TaskCreate):
+    id: int
+
+
+class ListTasks(BaseModel):
+    tasks: list[TaskResponse] = []
+
+
+class TaskUpdate(BaseModel):
+    title: str | None = None
+    description: str | None = None
+    state: TaskState | None = None
+
+
+class TaskFilter(BaseModel):
+    title: str | None = None
+    description: str | None = None
+    state: TaskState | None = None
+    offset: int = 0
+    limit: int = 10
